@@ -112,7 +112,7 @@ int main(int argc, char **argv){
 
   // Q2d: complete this to read time before calling mandelbrot with OpenMP API wall clock time
   double start = omp_get_wtime();
-	 = omp_get_wtime();
+	 
   // compute mandelbrot set
   mandelbrot(Nre, Nim, cmin, cmax, count); 
   
