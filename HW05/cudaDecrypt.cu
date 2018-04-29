@@ -15,11 +15,15 @@
     unsigned int ab = 0;
   
     while (b > 0) {
+
       if (b%2 == 1) ab = (ab +  za) % p;
       za = (2 * za) % p;
       b /= 2;
+
     }
+
     return ab;
+
   }
 
   __device__ unsigned int CUDAModExp(unsigned int a, unsigned int b, unsigned int p){
@@ -28,10 +32,13 @@
     unsigned int aExpb = 1;
   
     while (b > 0) {
+
       if (b%2 == 1) aExpb = CUDAModProd(aExpb, z, p);
       z = CUDAModProd(z, z, p);
       b /= 2;
+
     }
+
     return aExpb;
 
   }
@@ -57,6 +64,7 @@
   
 int main (int argc, char **argv) {
    unsigned int n, p, g, h, x;
+
    unsigned int Nints;
 
   //get the secret key from the user
@@ -99,13 +107,15 @@ int main (int argc, char **argv) {
 
     int Nblocks = (p+Nthreads-1)/Nthreads;
 
-    unsigned int *h_x = (unsigned int *) malloc(Nints*sizeof(unsigned int));
+    unsigned int *a = (unsigned int *) malloc(Nints*sizeof(unsigned int));
 
-    unsigned int *d_a;
+    unsigned int *b;
 
-    cudaMalloc(&d_a, sizeof(unsigned int));
+    cudaMalloc(&b, sizeof(unsigned int));
     double startTime = clock();
-    zaxbys <<<Nblocks,Nthreads>>> (p,g,h,d_a);
+
+
+    zaxbys <<<Nblocks,Nthreads>>> (p,g,h,b);
     cudaDeviceSynchronize();
     double endTime = clock();
 
@@ -117,9 +127,9 @@ int main (int argc, char **argv) {
 
     printf("Searching all keys took %g seconds, throughput was %g values tested per second.\n", totalTime, throughput);
     
-    cudaMemcpy(h_x, d_a, sizeof(unsigned int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(a, b, sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
-    x = *h_x;
+    x = *a;
   }
 
   
@@ -132,7 +142,7 @@ int main (int argc, char **argv) {
   convertZToString(ary1, Nints, origins, Numchrs);
 
   printf("The message is %s\n", origins);
-
+  //close out the txt files
   fclose(messy);
   fclose(filly);
   
